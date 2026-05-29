@@ -11,16 +11,16 @@
 
 Pour MEDISOL, valider ces 8 compétences :
 
-| #   | Objectif                                                   | État | Deadline | Validation |
-| --- | ---------------------------------------------------------- | ---- | -------- | ---------- |
-| 1️⃣  | **Hyperviseur** (Proxmox/XCP-ng adapté HDS)                | ⚠️   | 15 juin  | [ ]        |
-| 2️⃣  | **Ressources & Sécurité** (Segmentation VLAN 4 niveaux)    | ⚠️   | 15 juin  | [ ]        |
-| 3️⃣  | **Hybride On-Prem / Cloud** (Backups AWS Glacier)          | ⚠️   | 18 juin  | [ ]        |
-| 4️⃣  | **Supervision** (Zabbix/ELK monitoring services critiques) | ⚠️   | 18 juin  | [ ]        |
-| 5️⃣  | **Sauvegardes & PRA** (Veeam 4x/jour incrémental)          | ⚠️   | 20 juin  | [ ]        |
-| 6️⃣  | **VDI & Profils** (Accès distant médecins)                 | ⚠️   | 18 juin  | [ ]        |
-| 7️⃣  | **Hyper-V & Résilience**                                   | ⚠️   | 20 juin  | [ ]        |
-| 8️⃣  | **PRA / PCO** (Plan continuité + tests)                    | ⚠️   | 20 juin  | [ ]        |
+| #   | Objectif                                                                 | État | Deadline | Validation |
+| --- | ------------------------------------------------------------------------ | ---- | -------- | ---------- |
+| 1️⃣  | **Hyperviseur / IaaS** (Azure VMs via Terraform — France Central HDS)     | ⚠️   | 15 juin  | [ ]        |
+| 2️⃣  | **Ressources & Sécurité** (Entra ID P2 + NSG + Azure Firewall + Key Vault) | ⚠️   | 15 juin  | [ ]        |
+| 3️⃣  | **Full Cloud Azure** (France Central HDS + Terraform IaC)                | ⚠️   | 18 juin  | [ ]        |
+| 4️⃣  | **Supervision** (Azure Monitor + Log Analytics + Microsoft Sentinel)      | ⚠️   | 18 juin  | [ ]        |
+| 5️⃣  | **Sauvegardes & PRA** (Azure Backup GRS + Azure Site Recovery)            | ⚠️   | 20 juin  | [ ]        |
+| 6️⃣  | **VDI & Profils** (Azure Virtual Desktop — logiciel patient + nomades)    | ⚠️   | 18 juin  | [ ]        |
+| 7️⃣  | **Résilience & HA** (Availability Zones + ASR + Terraform state remote)   | ⚠️   | 20 juin  | [ ]        |
+| 8️⃣  | **PRA / PCO** (Drill ASR + runbooks Azure Automation + mesure RTO/RPO)    | ⚠️   | 20 juin  | [ ]        |
 
 ---
 
@@ -36,46 +36,45 @@ GRP2-MEDISOL/
 ├── 02-architecture/
 │   ├── ARCHITECTURE.md               ✅ Justification hyperviseur, schémas VLANs
 │   ├── schemas/
-│   │   ├── architecture-globale.md   ✅ Vue d'ensemble infra
-│   │   ├── segmentation-vlans.md     ✅ VLAN Métier/Invités/Admin/Imagerie
-│   │   ├── firewall-ha.md            ✅ Firewall redondance (Fortinet)
-│   │   └── reseau.png / .svg         ✅ Diagramme réseau visuel
-│   └── conformite-hds-rgpd.md        ✅ Mapping critères HDS/RGPD
+│   │   ├── architecture-globale.md   ✅ Vue d'ensemble Azure (VNet, subnets, services)
+│   │   ├── azure-network.md          ✅ Subnets + NSG + Azure Firewall Premium
+│   │   ├── avd-architecture.md       ✅ Azure Virtual Desktop topology
+│   │   └── azure-architecture.png    ✅ Diagramme réseau visuel
+│   └── conformite-hds-rgpd.md        ✅ Mapping critères HDS/RGPD → services Azure
 │
 ├── 03-mise-en-oeuvre/
-│   ├── 01-hyperviseur/
-│   │   ├── selection-justification.md ✅ Proxmox vs XCP-ng (choix + raisons)
-│   │   ├── config-proxmox.md          ✅ Installation, clustering, HA
-│   │   └── logs-implementation.txt    ✅ Preuves configuration
+│   ├── 01-terraform/
+│   │   ├── selection-justification.md ✅ Azure vs on-prem (justification + TCO 3 ans)
+│   │   ├── terraform-structure.md     ✅ Modules Terraform (networking, avd, storage...)
+│   │   └── terraform-apply-logs.txt   ✅ Preuves déploiement (terraform plan output)
 │   │
-│   ├── 02-vms/
-│   │   ├── dimensionnement.md         ✅ Specs par service (RDS, NAS client, etc.)
-│   │   ├── templates/
-│   │   │   └── windows-server.sh      ✅ Script template VM
-│   │   └── inventaire-vms.md          ✅ Liste VMs + specs
+│   ├── 02-identity/
+│   │   ├── entra-id-config.md         ✅ Entra ID P2 : groupes, MFA, Conditional Access
+│   │   ├── rbac-assignments.md        ✅ RBAC par rôle (Praticien / Admin / RH)
+│   │   └── comptes-nominatifs.md      ✅ Remplacement compte Lyliandu33
 │   │
 │   ├── 03-reseau/
-│   │   ├── vlans-config.md            ✅ VLAN 100/200/300/400 détail
-│   │   ├── firewall-rules.md          ✅ Règles Fortinet HA
+│   │   ├── vnet-subnets-config.md     ✅ VNet 10.0.0.0/16 + 4 subnets + NSG
+│   │   ├── azure-firewall-rules.md    ✅ Règles Azure Firewall Premium (IDPS)
 │   │   ├── matrix-flux.md             ✅ Tableau flux réseau complet
-│   │   └── vpn-client.md              ✅ Accès distant médecins sécurisé
+│   │   └── vpn-p2s.md                 ✅ Azure VPN Gateway P2S praticiens nomades
 │   │
 │   ├── 04-stockage/
-│   │   ├── nas-qnap-config.md         ✅ NAS RAID6 (4TB + 4TB) snapshots
-│   │   ├── rds-storage.md             ✅ Profils utilisateurs RDS
-│   │   └── backup-strategy.md         ✅ Rotation backups Veeam
+│   │   ├── azure-files-config.md      ✅ Azure Files Premium (SMB 3.0, FSLogix)
+│   │   ├── netapp-files-config.md     ✅ Azure NetApp Files (imageries médicales)
+│   │   └── backup-strategy.md         ✅ Azure Backup GRS + soft delete 30j
 │   │
 │   ├── 05-backup-pra/
-│   │   ├── plan-backup-detaille.md    ✅ Veeam : 4x/jour incrémental + 1x/nuit full
-│   │   ├── pra-procedure.md           ✅ Steps restauration VM complète
-│   │   ├── test-restauration.md       ✅ Rapport test : date, durée, résultats
-│   │   └── rpo-rto-mesure.md          ✅ Métriques vs objectifs
+│   │   ├── azure-backup-policy.md     ✅ Recovery Services Vault + policies ASR
+│   │   ├── asr-replication.md         ✅ ASR France Central → France South
+│   │   ├── test-restauration.md       ✅ Rapport test : date, durée, RTO mesuré
+│   │   └── rpo-rto-mesure.md          ✅ Métriques vs objectifs (Azure Backup report)
 │   │
 │   ├── 06-supervision/
-│   │   ├── zabbix-config.md           ✅ Installation + agents VMs
-│   │   ├── dashboards.md              ✅ Alertes sur services critiques
-│   │   ├── elk-stack.md               ✅ Logs centralisés (si applicable)
-│   │   └── screenshots-alertes.txt    ✅ Preuves fonctionnement
+│   │   ├── log-analytics-workspace.md ✅ Log Analytics + Diagnostic Settings
+│   │   ├── sentinel-config.md         ✅ Microsoft Sentinel : règles HDS, audit trail
+│   │   ├── azure-monitor-alerts.md    ✅ Alertes CPU/Disk/AVD + Action Groups
+│   │   └── workbook-screenshots.txt   ✅ Preuves dashboards Azure Workbooks
 │   │
 │   ├── 07-vdi-acces-distant/
 │   │   ├── rds-config.md              ✅ RDS Farm médecins (VDI personnalisée)
@@ -138,40 +137,39 @@ GRP2-MEDISOL/
 
 **MEDISOL Spécifique :**
 
-- [ ] Dimensionner VMs : RDS HA (médecins), NAS client, services web, admin
-- [ ] Documenter 4 VLANs : Métier(100) / Invités(200) / Admin(300) / Imagerie(400)
-- [ ] Firewall rules : isoler Imagerie, patient data, services critiques
-- [ ] Accès médecins : VPN 2FA, accès RDS chiffré, audit trail
-- [ ] Chiffrement disques VM (patient data)
+- [ ] Justifier choix Azure (vs Proxmox on-prem) : HDS, zéro CAPEX, HA natif Availability Zones
+- [ ] `terraform apply` module `avd` : déployer Azure Virtual Desktop Session Hosts
+- [ ] Configurer Azure VMs Standard_D4s_v3 en Availability Set/Zone
+- [ ] Documenter dimensionnement AVD (32 users, 3 Session Hosts)
+- [ ] Tester logiciel patient dans AVD (latence, compatibilité)
 
 **Livrables :**
 
-- [ ] Tableau dimensionnement VMs + justif ressources
-- [ ] Matrice flux réseau (32 colonnes max : utilisateurs, services internes, externes)
-- [ ] Schéma VLANs + tags 802.1Q
-- [ ] Config firewall (permettre métier, bloquer inter-VLAN non-autorisés)
-- [ ] Documentation accès médecins (VPN, 2FA, RDS)
+- [ ] `infrastructure/terraform/modules/avd/` : code Terraform versionné
+- [ ] Capture d'écran Azure Portal : VMs déployées + AVD Host Pool actif
+- [ ] Justification Azure vs on-prem (tableau TCO 3 ans)
+- [ ] Comparatif AVD vs RDS on-prem (coût, HA, conformité HDS)
 
 **État :** ❌ / ⚠️ / ✅ | **Notes :**
 
 ---
 
-### Objectif 3️⃣ — Hybride On-Prem / Cloud (Backups AWS)
+### Objectif 3️⃣ — Full Cloud Azure (France Central HDS + Terraform IaC)
 
 **MEDISOL Spécifique :**
 
-- [ ] Justifier : on-prem pour données patient (latence basse, compliance HDS), cloud pour backups off-site
-- [ ] Configurer backups Veeam → AWS Glacier (immuable, résilience)
-- [ ] Documenter connectivité : site serveur campus → AWS (ou Equinix)
-- [ ] Expliquer avantages : redondance géographique, conformité archivage
-- [ ] Tester restauration depuis backup AWS
+- [ ] Justifier Full Cloud Azure : HDS certifié, souveraineté France, zéro CAPEX
+- [ ] Démontrer données en France uniquement : Azure Policy `allowedLocations = [francecentral, francesouth]`
+- [ ] Configurer remote state Terraform : Azure Storage Account chiffré + Managed Identity
+- [ ] Démontrer reproductibilité IaC : `terraform destroy` + `terraform apply` = même résultat
+- [ ] Prouver clés de chiffrement gérées par Azure Key Vault
 
 **Livrables :**
 
-- [ ] Decision document hybrid (on-prem + AWS)
-- [ ] Architecture connectivité on-prem ↔ cloud
-- [ ] Config Veeam AWS Glacier
-- [ ] Test restauration from cloud backup (rapport)
+- [ ] `infrastructure/terraform/` : code complet versionné (modules structurés)
+- [ ] `terraform plan` output : zéro ressource hors France
+- [ ] Azure Policy assignment : capture + rapport conformité
+- [ ] README Terraform avec instructions `init` / `plan` / `apply`
 
 **État :** ❌ / ⚠️ / ✅ | **Notes :**
 
@@ -181,104 +179,103 @@ GRP2-MEDISOL/
 
 **MEDISOL Spécifique :**
 
-- [ ] Zabbix/ELK/Grafana : monitorer RDS, NAS, Firewall, services métier
-- [ ] Alertes seuils : CPU > 80%, RAM > 85%, Disk > 90%, RTO objectif breach
-- [ ] Dashboard : état services critiques, incident trend
-- [ ] Audit trail : accès patient data, logins RDS, changes firewall
-- [ ] SLA monitoring : uptime RDS, latence réseau Métier VLAN
+- [ ] Déployer Log Analytics Workspace (Terraform `module monitoring`)
+- [ ] Activer Diagnostic Settings sur toutes les ressources Azure
+- [ ] Configurer Microsoft Sentinel : détection anoméalies + audit trail HDS
+- [ ] Alertes Azure Monitor : CPU > 80%, espace disque > 90%, AVD sessions
+- [ ] Dashboard Azure Workbook : uptime AVD, activité patients, inc. sécurité
 
 **Livrables :**
 
-- [ ] Zabbix install guide + agent deployment
-- [ ] Alert rules + thresholds documentation
-- [ ] Screenshots dashboards supervision (live ou video)
-- [ ] Audit logs exports (ex: RDS logins last week)
+- [ ] `infrastructure/terraform/modules/monitoring/` : code Terraform
+- [ ] Capture Log Analytics : requête KQL audit accès patients
+- [ ] Capture Sentinel : dashboard incidents HDS
+- [ ] Azure Monitor alert rules : définitions + tests
 
 **État :** ❌ / ⚠️ / ✅ | **Notes :**
 
 ---
 
-### Objectif 5️⃣ — Sauvegardes & PRA (Veeam MEDISOL)
+### Objectif 5️⃣ — Sauvegardes & PRA (Azure Backup + ASR)
 
 **MEDISOL Spécifique :**
 
-- [ ] Stratégie Veeam : 4x/jour incrémental + 1x/nuit full
-- [ ] Rétention : 2 semaines on-site (NAS local), 3 mois off-site (AWS Glacier)
-- [ ] RPO/RTO cibles : RPO 1h (accepté par clinique), RTO 30-60min
-- [ ] Procédure restauration : VM patient data, RDS profil médecin, fichiers métier
-- [ ] Effectuer drill PRA : restauration VM complète mesurée
+- [ ] Configurer Recovery Services Vault (Terraform) avec réplication GRS
+- [ ] Politique backup : AVD Session Hosts + Azure Files (RPO 1h)
+- [ ] Activer soft delete 30j (protection ransomware)
+- [ ] Configurer Azure Site Recovery : réplication France Central → France South
+- [ ] Tester restauration (Azure Backup) : mesurer RTO effectif
+- [ ] Test Failover ASR (non-disruptif) : démontrer continuité
 
 **Livrables :**
 
-- [ ] Backup policy document (Veeam settings)
-- [ ] Rétention matrix (on-site vs off-site)
-- [ ] Restore procedure (step-by-step avec screenshots)
-- [ ] PRA test report (date, VMs testées, durée restauration, succès/fails)
-- [ ] RPO/RTO calculated vs objectifs SLA
+- [ ] `infrastructure/terraform/modules/backup/` : code Terraform
+- [ ] Rapport test restauration : date, durée, RTO mesuré vs objectif
+- [ ] Capture ASR replication status (Healthy)
+- [ ] Rapport Test Failover ASR (objectif RTO < 30 min)
 
 **État :** ❌ / ⚠️ / ✅ | **Notes :**
 
 ---
 
-### Objectif 6️⃣ — VDI & Accès Distant (Médecins MEDISOL)
+### Objectif 6️⃣ — VDI & Profils (Azure Virtual Desktop)
 
 **MEDISOL Spécifique :**
 
-- [ ] RDS Farm médecins : accès distant chiffré, 2FA, audit trail
-- [ ] Profils utilisateurs : applis métier clinique (dossiers patients, agenda)
-- [ ] Workspaces persistants (VDI personnalisée par médecin)
-- [ ] Imprimantes clinique : redirection USB (lecteur smartcard), sécurisation
-- [ ] Tester connexion RDS médecin + appli patient métier
+- [ ] Déployer AVD Host Pool (pooled 32 users + personal pour praticiens nomades)
+- [ ] Configurer FSLogix Profile Containers sur Azure Files Premium
+- [ ] Tester logiciel patient dans session AVD (latence, compatibilité)
+- [ ] Accès praticiens nomades via navigateur (HTTPS) sans VPN supplémentaire
+- [ ] MFA Entra ID obligé pour toute session AVD
 
 **Livrables :**
 
-- [ ] RDS architecture + security
-- [ ] Template VM RDS + applis métier installées
-- [ ] User profile documentation
-- [ ] Test connexion RDS (log+screenshot médecin accessing app)
-- [ ] Périphériques redirection (printer, smartcard reader)
+- [ ] Capture AVD : session active logiciel patient
+- [ ] Rapport performance : temps réponse < 2s objectif
+- [ ] Documentation accès nomade (fiche onboarding praticien)
+- [ ] Entra ID Conditional Access policy : capture
 
 **État :** ❌ / ⚠️ / ✅ | **Notes :**
 
 ---
 
-### Objectif 7️⃣ — Hyper-V & Résilience (Lien Atelier Windows)
+### Objectif 7️⃣ — Résilience & HA (Availability Zones + ASR + Terraform)
 
 **MEDISOL Spécifique :**
 
-- [ ] Lien atelier résilience Windows : failover clustering applicables MEDISOL ?
-- [ ] Comparer Hyper-V vs Proxmox pour résilience : HA, live migration, SANs
-- [ ] MEDISOL decision : Proxmox clustering HA OU Hyper-V SANs (justifier)
-- [ ] Scénarios failover : défaillance nœud hyperviseur → RDS bascule < 1min
-- [ ] Documenter test failover (arrêt VM, basculement, vérification services)
+- [ ] Déployer VMs Azure en Availability Zone 1/2/3 (Terraform `zones`)
+- [ ] Configurer Azure Site Recovery (ASR) : réplication France Central → France South
+- [ ] Scénario failover zone : défaillance AZ 1 → AVD bascule AZ 2 automatiquement
+- [ ] Remote state Terraform en HA (Azure Storage redondant LRS)
+- [ ] Documenter test failover : métrique RTO mesurée
 
 **Livrables :**
 
-- [ ] Comparatif Hyper-V vs Proxmox pour MEDISOL
-- [ ] Architecture résilience (failover, redondance, clustering)
-- [ ] Failover test report (date, scénario, temps basculement)
-- [ ] Lien explicite atelier Windows (ex: AD replication, WSFC concepts)
+- [ ] Terraform plan output : `zone` paramètre visible sur toutes les VMs
+- [ ] ASR replication topology diagram (France Central → France South)
+- [ ] Failover test report (date, scénario, RTO < 30 min)
+- [ ] Comparatif HA Azure vs Hyper-V on-prem (justification choix Azure)
 
 **État :** ❌ / ⚠️ / ✅ | **Notes :**
 
 ---
 
-### Objectif 8️⃣ — PRA / PCO Complet (MEDISOL)
+### Objectif 8️⃣ — PRA / PCO Complet (Azure Automation + Runbooks)
 
 **MEDISOL Spécifique :**
 
-- [ ] PRA documenté : procédure activation (quoi, qui, quand, comment)
-- [ ] Services critiques : RDS, NAS patient data, Firewall, Zabbix
-- [ ] RTO/RPO par service : RDS 30min, patient data 1h, admin services 4h
-- [ ] Checklist PRA : contact manager, test backups, restore practice, comms
-- [ ] Drill PRA effectué : test restauration ≥1 VM, vérification service, timing mesuré
-- [ ] Post-drill : lessons learned, améliorations documentation
+- [ ] PRA documenté : procédure activation Azure (quoi, qui, quand, comment)
+- [ ] Services critiques : AVD, Azure Files, ASR, Entra ID, VPN Gateway
+- [ ] RTO/RPO par service : AVD < 30min, Azure Files < 5min (snapshot), admin 1h
+- [ ] Azure Automation Runbook : déclenchement failover automatique
+- [ ] Drill PRA effectué : ASR Test Failover + restauration Azure Backup mesurée
+- [ ] Post-drill : lessons learned, améliorations Terraform
 
 **Livrables :**
 
-- [ ] PRA document complet (1-2 pages)
-- [ ] Services critiques matrix (criticité, RTO/RPO cible)
-- [ ] Activation checklist + responsabilités
+- [ ] PRA document complet (procédure Azure Failover)
+- [ ] Services critiques matrix (criticité, RTO/RPO cible vs mesuré)
+- [ ] Azure Automation Runbook : code + capture exécution
 - [ ] Drill report (date, VMs testées, timing, issues, resolutions)
 - [ ] Lessons learned + amélioration recommendations
 
