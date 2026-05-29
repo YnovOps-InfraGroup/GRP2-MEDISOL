@@ -11,16 +11,16 @@
 
 Pour MEDISOL, valider ces 8 compétences :
 
-| #   | Objectif                                                                 | État | Deadline | Validation |
-| --- | ------------------------------------------------------------------------ | ---- | -------- | ---------- |
-| 1️⃣  | **Hyperviseur / IaaS** (Azure VMs via Terraform — France Central HDS)     | ⚠️   | 15 juin  | [ ]        |
+| #   | Objectif                                                                   | État | Deadline | Validation |
+| --- | -------------------------------------------------------------------------- | ---- | -------- | ---------- |
+| 1️⃣  | **Hyperviseur / IaaS** (Azure VMs via Terraform — France Central HDS)      | ⚠️   | 15 juin  | [ ]        |
 | 2️⃣  | **Ressources & Sécurité** (Entra ID P2 + NSG + Azure Firewall + Key Vault) | ⚠️   | 15 juin  | [ ]        |
-| 3️⃣  | **Full Cloud Azure** (France Central HDS + Terraform IaC)                | ⚠️   | 18 juin  | [ ]        |
-| 4️⃣  | **Supervision** (Azure Monitor + Log Analytics + Microsoft Sentinel)      | ⚠️   | 18 juin  | [ ]        |
-| 5️⃣  | **Sauvegardes & PRA** (Azure Backup GRS + Azure Site Recovery)            | ⚠️   | 20 juin  | [ ]        |
-| 6️⃣  | **VDI & Profils** (Azure Virtual Desktop — logiciel patient + nomades)    | ⚠️   | 18 juin  | [ ]        |
-| 7️⃣  | **Résilience & HA** (Availability Zones + ASR + Terraform state remote)   | ⚠️   | 20 juin  | [ ]        |
-| 8️⃣  | **PRA / PCO** (Drill ASR + runbooks Azure Automation + mesure RTO/RPO)    | ⚠️   | 20 juin  | [ ]        |
+| 3️⃣  | **Full Cloud Azure** (France Central HDS + Terraform IaC)                  | ⚠️   | 18 juin  | [ ]        |
+| 4️⃣  | **Supervision** (Azure Monitor + Log Analytics + Microsoft Sentinel)       | ⚠️   | 18 juin  | [ ]        |
+| 5️⃣  | **Sauvegardes & PRA** (Azure Backup GRS + Azure Site Recovery)             | ⚠️   | 20 juin  | [ ]        |
+| 6️⃣  | **VDI & Profils** (Azure Virtual Desktop — logiciel patient + nomades)     | ⚠️   | 18 juin  | [ ]        |
+| 7️⃣  | **Résilience & HA** (Availability Zones + ASR + Terraform state remote)    | ⚠️   | 20 juin  | [ ]        |
+| 8️⃣  | **PRA / PCO** (Drill ASR + runbooks Azure Automation + mesure RTO/RPO)     | ⚠️   | 20 juin  | [ ]        |
 
 ---
 

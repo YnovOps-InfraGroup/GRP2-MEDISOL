@@ -157,18 +157,18 @@
 
 > ℹ️ **Modèle Azure = zéro CapEx matériel.** Coûts mensuels Azure + intégration RMI uniquement.
 
-| Poste | Détail | Coût mensuel estimé |
-|-------|--------|--------------------|
-| **Azure Compute (AVD)** | Session Hosts Standard_D4s_v3 × 3 | ~450 €/mois |
-| **Azure Files Premium** | 1 To (patients + FSLogix) | ~120 €/mois |
-| **Azure NetApp Files** | 4 To imageries | ~300 €/mois |
-| **Azure Firewall Premium** | IDPS + TLS | ~900 €/mois |
-| **VPN Gateway P2S** | VpnGw2 | ~180 €/mois |
-| **Azure Backup + ASR** | GRS Recovery Vault | ~80 €/mois |
-| **Microsoft Sentinel** | ~2 Go/j logs | ~120 €/mois |
-| **Licences M365 E3** | 32 users | ~640 €/mois |
-| **TOTAL OPEX** | | **~2 800 €/mois** |
-| **Intégration RMI (one-shot)** | Design + déploiement Terraform | ~12 000 € |
+| Poste                          | Détail                            | Coût mensuel estimé |
+| ------------------------------ | --------------------------------- | ------------------- |
+| **Azure Compute (AVD)**        | Session Hosts Standard_D4s_v3 × 3 | ~450 €/mois         |
+| **Azure Files Premium**        | 1 To (patients + FSLogix)         | ~120 €/mois         |
+| **Azure NetApp Files**         | 4 To imageries                    | ~300 €/mois         |
+| **Azure Firewall Premium**     | IDPS + TLS                        | ~900 €/mois         |
+| **VPN Gateway P2S**            | VpnGw2                            | ~180 €/mois         |
+| **Azure Backup + ASR**         | GRS Recovery Vault                | ~80 €/mois          |
+| **Microsoft Sentinel**         | ~2 Go/j logs                      | ~120 €/mois         |
+| **Licences M365 E3**           | 32 users                          | ~640 €/mois         |
+| **TOTAL OPEX**                 |                                   | **~2 800 €/mois**   |
+| **Intégration RMI (one-shot)** | Design + déploiement Terraform    | ~12 000 €           |
 
 > Estimations à affiner lors de l'entretien 2 (sizing réel, volumes data).
 

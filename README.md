@@ -37,16 +37,16 @@
 
 ## 🎯 Objectifs du Projet
 
-| Objectif | Priorité | Statut |
-|----------|----------|--------|
-| Migrer vers Azure (PC → Full Cloud Azure France Central HDS) | 🔴 Critique | En cours |
-| Implémenter PRA/PCA + tests | 🔴 Critique | Planification |
-| Sécuriser accès (comptes individuels, 2FA, politique MDP) | 🔴 Critique | Planification |
-| Segmenter le réseau (VLAN 4 niveaux) | 🔴 Critique | Planification |
-| Backup automatisé, off-site, immuable | 🔴 Critique | Planification |
-| Conformité HDS + RGPD (souveraineté FR) | 🟠 Haute | À auditer |
-| Accès distant praticiens nomades (AVD + P2S VPN) | 🟠 Haute | À qualifier |
-| Wi-Fi segmenté + couverture 4K clients (on-prem, Azure Arc) | 🟠 Haute | À déployer |
+| Objectif                                                     | Priorité    | Statut        |
+| ------------------------------------------------------------ | ----------- | ------------- |
+| Migrer vers Azure (PC → Full Cloud Azure France Central HDS) | 🔴 Critique | En cours      |
+| Implémenter PRA/PCA + tests                                  | 🔴 Critique | Planification |
+| Sécuriser accès (comptes individuels, 2FA, politique MDP)    | 🔴 Critique | Planification |
+| Segmenter le réseau (VLAN 4 niveaux)                         | 🔴 Critique | Planification |
+| Backup automatisé, off-site, immuable                        | 🔴 Critique | Planification |
+| Conformité HDS + RGPD (souveraineté FR)                      | 🟠 Haute    | À auditer     |
+| Accès distant praticiens nomades (AVD + P2S VPN)             | 🟠 Haute    | À qualifier   |
+| Wi-Fi segmenté + couverture 4K clients (on-prem, Azure Arc)  | 🟠 Haute    | À déployer    |
 
 ---
 
@@ -138,12 +138,12 @@ Utiliser `.env.template` pour les configurations (voir `.gitignore`).
 
 ## 📞 Points de Contact
 
-| Rôle | Nom | Responsabilité |
-|------|-----|----------------|
-| Chef de Projet / Auditeur PRA | Gregory M. | PRA/PCA, coordination client |
-| RSSI | Lylian C. | Sécurité, conformité HDS/RGPD |
-| Architecte Infra | Thibaut D. | Hyperviseur, réseau, stockage |
-| Formateur / Client simulé | Florian G. | Entretiens, validation |
+| Rôle                          | Nom        | Responsabilité                |
+| ----------------------------- | ---------- | ----------------------------- |
+| Chef de Projet / Auditeur PRA | Gregory M. | PRA/PCA, coordination client  |
+| RSSI                          | Lylian C.  | Sécurité, conformité HDS/RGPD |
+| Architecte Infra              | Thibaut D. | Hyperviseur, réseau, stockage |
+| Formateur / Client simulé     | Florian G. | Entretiens, validation        |
 
 > **Organisation :** Groupe 2 — Paire : Sujet 1 METALIS + Sujet 4 MEDISOL
 
@@ -151,15 +151,15 @@ Utiliser `.env.template` pour les configurations (voir `.gitignore`).
 
 ## 📅 Calendrier MSPR
 
-| Date | Événement | Statut |
-|------|-----------|--------|
-| 26 mai 2026 | ✅ Entretien 1 MEDISOL | Réalisé |
-| Sem. 1–3 | Audit on-site + Architecture 3 scénarios | En cours |
-| 16 juin 2026 (matin) | ⏳ Entretien 2 MEDISOL | À venir |
-| 16 → 22 juin | Finalisation docs + tests PRA | À venir |
-| **22 juin 23h** | **Rendu final** → <florian.guillemard@ynov.com> | ⏳ |
-| 23 juin | Annonce cas soutenance | ⏳ |
-| 25 juin | Soutenance (si MEDISOL annoncé) | ⏳ |
+| Date                 | Événement                                       | Statut   |
+| -------------------- | ----------------------------------------------- | -------- |
+| 26 mai 2026          | ✅ Entretien 1 MEDISOL                          | Réalisé  |
+| Sem. 1–3             | Audit on-site + Architecture 3 scénarios        | En cours |
+| 16 juin 2026 (matin) | ⏳ Entretien 2 MEDISOL                          | À venir  |
+| 16 → 22 juin         | Finalisation docs + tests PRA                   | À venir  |
+| **22 juin 23h**      | **Rendu final** → <florian.guillemard@ynov.com> | ⏳       |
+| 23 juin              | Annonce cas soutenance                          | ⏳       |
+| 25 juin              | Soutenance (si MEDISOL annoncé)                 | ⏳       |
 
 ---
 

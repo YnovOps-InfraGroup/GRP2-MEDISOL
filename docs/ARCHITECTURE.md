@@ -7,16 +7,16 @@
 
 > ⚠️ **IMPORTANT — Deux états distincts :**
 >
-> | | Infrastructure **actuelle** | Infrastructure **cible** (remédiation) |
-> |-|---------------------------|----------------------------------------|
-> | **État** | En place aujourd'hui chez MEDISOL | À déployer via Terraform (Phase 1–5) |
-> | **Compute** | Simple PC Windows 4 ans | Azure VMs + Azure Virtual Desktop (AVD) |
-> | **Identité** | Compte unique `Lyliandu33` partagé | Microsoft Entra ID P2 + MFA + CA |
-> | **Réseau** | Réseau plat non segmenté | Azure VNet + NSG + Azure Firewall Premium |
-> | **Stockage** | 2 To PC local (non sauvegardé fiablement) | Azure Files Premium + Azure NetApp Files |
-> | **Backup** | Manuel, irrégulier, sur site | Azure Backup GRS + ASR (France Central → South) |
-> | **Monitoring** | Aucun | Azure Monitor + Log Analytics + Sentinel |
-> | **IaC** | Aucune (configuration manuelle) | **Terraform `azurerm` ≥ 4.x** |
+> |                | Infrastructure **actuelle**               | Infrastructure **cible** (remédiation)          |
+> | -------------- | ----------------------------------------- | ----------------------------------------------- |
+> | **État**       | En place aujourd'hui chez MEDISOL         | À déployer via Terraform (Phase 1–5)            |
+> | **Compute**    | Simple PC Windows 4 ans                   | Azure VMs + Azure Virtual Desktop (AVD)         |
+> | **Identité**   | Compte unique `Lyliandu33` partagé        | Microsoft Entra ID P2 + MFA + CA                |
+> | **Réseau**     | Réseau plat non segmenté                  | Azure VNet + NSG + Azure Firewall Premium       |
+> | **Stockage**   | 2 To PC local (non sauvegardé fiablement) | Azure Files Premium + Azure NetApp Files        |
+> | **Backup**     | Manuel, irrégulier, sur site              | Azure Backup GRS + ASR (France Central → South) |
+> | **Monitoring** | Aucun                                     | Azure Monitor + Log Analytics + Sentinel        |
+> | **IaC**        | Aucune (configuration manuelle)           | **Terraform `azurerm` ≥ 4.x**                   |
 >
 > **Ce document décrit uniquement l'infrastructure cible.** L'état actuel est documenté dans [AUDIT_FINDINGS.md](./AUDIT_FINDINGS.md).
 
