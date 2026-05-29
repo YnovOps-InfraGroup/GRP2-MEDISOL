@@ -39,14 +39,14 @@
 
 | Objectif | Priorité | Statut |
 |----------|----------|--------|
-| Remplacer infrastructure "gruyère" (PC → vrai hyperviseur) | 🔴 Critique | En cours |
+| Migrer vers Azure (PC → Full Cloud Azure France Central HDS) | 🔴 Critique | En cours |
 | Implémenter PRA/PCA + tests | 🔴 Critique | Planification |
 | Sécuriser accès (comptes individuels, 2FA, politique MDP) | 🔴 Critique | Planification |
 | Segmenter le réseau (VLAN 4 niveaux) | 🔴 Critique | Planification |
 | Backup automatisé, off-site, immuable | 🔴 Critique | Planification |
 | Conformité HDS + RGPD (souveraineté FR) | 🟠 Haute | À auditer |
-| Accès distant praticiens nomades (VPN/RDS) | 🟠 Haute | À qualifier |
-| Wi-Fi segmenté + couverture 4K clients | 🟠 Haute | À déployer |
+| Accès distant praticiens nomades (AVD + P2S VPN) | 🟠 Haute | À qualifier |
+| Wi-Fi segmenté + couverture 4K clients (on-prem, Azure Arc) | 🟠 Haute | À déployer |
 
 ---
 
@@ -61,14 +61,22 @@ GRP2-MEDISOL/
 │   ├── PRA_PCA_PLAN.md          # Plan de reprise d'activité
 │   └── CONFORMITE_HDS.md        # Checklist conformité
 ├── infrastructure/
-│   ├── network/                 # Configs réseau (VLAN, firewall)
-│   ├── compute/                 # Serveurs, VMs
-│   ├── storage/                 # Sauvegarde, archivage
-│   └── monitoring/              # Supervision, alertes
+│   └── terraform/               # IaC Terraform (azurerm)
+│       ├── modules/
+│       │   ├── networking/      # VNet, NSG, Azure Firewall
+│       │   ├── identity/        # Entra ID, RBAC, MFA
+│       │   ├── avd/             # Azure Virtual Desktop
+│       │   ├── storage/         # Azure Files, NetApp Files
+│       │   ├── backup/          # Recovery Services Vault
+│       │   ├── monitoring/      # Log Analytics, Sentinel
+│       │   └── vpn/             # VPN Gateway P2S + Bastion
+│       └── environments/
+│           ├── staging/
+│           └── production/
 ├── scripts/
-│   ├── backup/                  # Scripts sauvegarde
-│   ├── restore/                 # Scripts reprise
-│   └── deploy/                  # Deployment scripts
+│   ├── backup/                  # Runbooks Azure Automation
+│   ├── restore/                 # Procédures ASR + restore
+│   └── deploy/                  # Scripts AzCopy migration
 ├── tests/
 │   ├── pra_tests/               # Tests PRA réguliers
 │   └── security_tests/          # Tests de sécurité
@@ -83,9 +91,10 @@ GRP2-MEDISOL/
 
 ### Prérequis
 
-- Accès administrateur à l'infrastructure MEDISOL
-- Outils audit réseau (nmap, wireshark, etc.)
-- Documentation existante (inventaire hardware, logiciels)
+- Subscription Azure dédiée (ou sandbox) avec droits Owner
+- Terraform ≥ 1.7 (`terraform --version`)
+- Azure CLI (`az login`) + `gh` CLI configuré
+- Accès admin infrastructure MEDISOL on-site (audit Wi-Fi)
 
 ### Étapes Initiales
 
