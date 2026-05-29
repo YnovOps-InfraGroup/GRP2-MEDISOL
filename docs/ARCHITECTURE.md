@@ -1,24 +1,39 @@
 # ARCHITECTURE.md - MEDISOL Infrastructure Azure Cible
 
-**Version :** 2.0 (Full Azure + Terraform)  
-**Last Updated :** 29 Mai 2026  
-**Décision :** Full Cloud Microsoft Azure — France Central (certifié HDS)  
+**Version :** 2.0 (Full Azure + Terraform)
+**Last Updated :** 29 Mai 2026
+**Décision :** Full Cloud Microsoft Azure — France Central (certifié HDS)
 **IaC :** Terraform (provider `azurerm`)
+
+> ⚠️ **IMPORTANT — Deux états distincts :**
+>
+> | | Infrastructure **actuelle** | Infrastructure **cible** (remédiation) |
+> |-|---------------------------|----------------------------------------|
+> | **État** | En place aujourd'hui chez MEDISOL | À déployer via Terraform (Phase 1–5) |
+> | **Compute** | Simple PC Windows 4 ans | Azure VMs + Azure Virtual Desktop (AVD) |
+> | **Identité** | Compte unique `Lyliandu33` partagé | Microsoft Entra ID P2 + MFA + CA |
+> | **Réseau** | Réseau plat non segmenté | Azure VNet + NSG + Azure Firewall Premium |
+> | **Stockage** | 2 To PC local (non sauvegardé fiablement) | Azure Files Premium + Azure NetApp Files |
+> | **Backup** | Manuel, irrégulier, sur site | Azure Backup GRS + ASR (France Central → South) |
+> | **Monitoring** | Aucun | Azure Monitor + Log Analytics + Sentinel |
+> | **IaC** | Aucune (configuration manuelle) | **Terraform `azurerm` ≥ 4.x** |
+>
+> **Ce document décrit uniquement l'infrastructure cible.** L'état actuel est documenté dans [AUDIT_FINDINGS.md](./AUDIT_FINDINGS.md).
 
 ---
 
 ## 1️⃣ Décision Architecturale — Pourquoi Full Azure
 
-| Critère | Justification |
-|---------|--------------|
-| **Certification HDS** | Azure France Central est certifié HDS nativement — obligation légale données patients |
-| **Souveraineté française** | Datacenter France Central (Paris) + France South (Marseille) |
-| **Zéro CAPEX** | Pas d'investissement matériel — OPEX mensuel maîtrisé |
-| **HA natif** | Availability Zones (3 zones) → RTO < 5 min sans infrastructure redondante dédiée |
-| **Disaster Recovery natif** | Azure Site Recovery France Central → France South |
-| **Identité unifiée** | Microsoft Entra ID P2 remplace directement le compte partagé `Lyliandu33` |
-| **VDI managé** | Azure Virtual Desktop pour logiciel patient — plus de client lourd local |
-| **Auditabilité** | Terraform + Azure Policy + Microsoft Sentinel = traçabilité RGPD complète |
+| Critère                     | Justification                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| **Certification HDS**       | Azure France Central est certifié HDS nativement — obligation légale données patients |
+| **Souveraineté française**  | Datacenter France Central (Paris) + France South (Marseille)                          |
+| **Zéro CAPEX**              | Pas d'investissement matériel — OPEX mensuel maîtrisé                                 |
+| **HA natif**                | Availability Zones (3 zones) → RTO < 5 min sans infrastructure redondante dédiée      |
+| **Disaster Recovery natif** | Azure Site Recovery France Central → France South                                     |
+| **Identité unifiée**        | Microsoft Entra ID P2 remplace directement le compte partagé `Lyliandu33`             |
+| **VDI managé**              | Azure Virtual Desktop pour logiciel patient — plus de client lourd local              |
+| **Auditabilité**            | Terraform + Azure Policy + Microsoft Sentinel = traçabilité RGPD complète             |
 
 ### Contraintes Actuelles (à migrer)
 
@@ -31,32 +46,32 @@
 
 ## 2️⃣ Azure Services Stack
 
-| Domaine | Service Azure | SKU / Tier | Remplace |
-|---------|--------------|------------|---------|
-| **Compute** | Azure Virtual Machines | Standard_D4s_v3 (Availability Set) | VMware ESXi |
-| **VDI / Logiciel patient** | Azure Virtual Desktop (AVD) | Pooled + Personal | RDS on-prem + client lourd |
-| **Identité** | Microsoft Entra ID P2 | + MFA + Conditional Access | Compte partagé `Lyliandu33` |
-| **Réseau** | Azure Virtual Network | VNet + Subnets + NSG + UDR | VLAN 802.1Q + switchs |
-| **Firewall** | Azure Firewall Premium | IDPS + TLS inspection | FortiGate hardware |
-| **Accès distant** | Azure VPN Gateway (P2S) + Azure Bastion | VpnGw2 | VPN IPSec on-prem |
-| **Stockage patients** | Azure Files Premium | SMB 3.0 chiffré | QNAP NAS RAID6 |
-| **Stockage imageries** | Azure NetApp Files | Standard tier | NAS secondaire |
-| **Backup** | Azure Backup | GRS (geo-redundant) | Veeam + disque externe |
-| **DR** | Azure Site Recovery | France Central → France South | Réplication manuelle |
-| **Monitoring** | Azure Monitor + Log Analytics | Workspace dédié | Zabbix + ELK |
-| **SIEM / Audit trail** | Microsoft Sentinel | + Healthcare workbook | ELK / audit manuel |
-| **Alertes** | Azure Monitor Alerts + Action Groups | Email + SMS | Alertes Zabbix |
-| **Wi-Fi (on-prem)** | Aruba / Ubiquiti AP Wi-Fi 6 | Géré via Azure Arc | Bornes actuelles |
-| **IaC** | Terraform (azurerm provider) | ≥ 4.x | — |
-| **Secrets** | Azure Key Vault | Standard | Variables en clair |
-| **DNS** | Azure Private DNS Zone | + Azure DNS | DNS box Orange |
+| Domaine                    | Service Azure                           | SKU / Tier                         | Remplace                    |
+| -------------------------- | --------------------------------------- | ---------------------------------- | --------------------------- |
+| **Compute**                | Azure Virtual Machines                  | Standard_D4s_v3 (Availability Set) | VMware ESXi                 |
+| **VDI / Logiciel patient** | Azure Virtual Desktop (AVD)             | Pooled + Personal                  | RDS on-prem + client lourd  |
+| **Identité**               | Microsoft Entra ID P2                   | + MFA + Conditional Access         | Compte partagé `Lyliandu33` |
+| **Réseau**                 | Azure Virtual Network                   | VNet + Subnets + NSG + UDR         | VLAN 802.1Q + switchs       |
+| **Firewall**               | Azure Firewall Premium                  | IDPS + TLS inspection              | FortiGate hardware          |
+| **Accès distant**          | Azure VPN Gateway (P2S) + Azure Bastion | VpnGw2                             | VPN IPSec on-prem           |
+| **Stockage patients**      | Azure Files Premium                     | SMB 3.0 chiffré                    | QNAP NAS RAID6              |
+| **Stockage imageries**     | Azure NetApp Files                      | Standard tier                      | NAS secondaire              |
+| **Backup**                 | Azure Backup                            | GRS (geo-redundant)                | Veeam + disque externe      |
+| **DR**                     | Azure Site Recovery                     | France Central → France South      | Réplication manuelle        |
+| **Monitoring**             | Azure Monitor + Log Analytics           | Workspace dédié                    | Zabbix + ELK                |
+| **SIEM / Audit trail**     | Microsoft Sentinel                      | + Healthcare workbook              | ELK / audit manuel          |
+| **Alertes**                | Azure Monitor Alerts + Action Groups    | Email + SMS                        | Alertes Zabbix              |
+| **Wi-Fi (on-prem)**        | Aruba / Ubiquiti AP Wi-Fi 6             | Géré via Azure Arc                 | Bornes actuelles            |
+| **IaC**                    | Terraform (azurerm provider)            | ≥ 4.x                              | —                           |
+| **Secrets**                | Azure Key Vault                         | Standard                           | Variables en clair          |
+| **DNS**                    | Azure Private DNS Zone                  | + Azure DNS                        | DNS box Orange              |
 
 ### Régions Azure
 
-| Région | Usage | HDS |
-|--------|-------|-----|
-| **France Central** (Paris) | Production principale | ✅ Certifié HDS |
-| **France South** (Marseille) | DR / réplication ASR | ✅ Certifié HDS |
+| Région                       | Usage                 | HDS             |
+| ---------------------------- | --------------------- | --------------- |
+| **France Central** (Paris)   | Production principale | ✅ Certifié HDS |
+| **France South** (Marseille) | DR / réplication ASR  | ✅ Certifié HDS |
 
 ---
 
@@ -122,67 +137,67 @@
 
 ### A. Identité & Accès (Entra ID P2)
 
-| Composant | Configuration | Remplace |
-|-----------|--------------|---------|
-| Microsoft Entra ID P2 | Tenant dédié MEDISOL | Compte partagé `Lyliandu33` |
-| 32 comptes nominatifs | Rôles RBAC (Praticien / Admin / RH / Compta) | Un seul compte |
-| Conditional Access | MFA obligatoire + device compliance | Aucun |
-| Privileged Identity Management | Just-in-time admin access | Accès permanent root |
-| Entra ID Password Protection | Politique MDP + rotation 90j | Jamais modifié |
-| Azure AD Connect (optionnel) | Sync si AD local conservé | — |
+| Composant                      | Configuration                                | Remplace                    |
+| ------------------------------ | -------------------------------------------- | --------------------------- |
+| Microsoft Entra ID P2          | Tenant dédié MEDISOL                         | Compte partagé `Lyliandu33` |
+| 32 comptes nominatifs          | Rôles RBAC (Praticien / Admin / RH / Compta) | Un seul compte              |
+| Conditional Access             | MFA obligatoire + device compliance          | Aucun                       |
+| Privileged Identity Management | Just-in-time admin access                    | Accès permanent root        |
+| Entra ID Password Protection   | Politique MDP + rotation 90j                 | Jamais modifié              |
+| Azure AD Connect (optionnel)   | Sync si AD local conservé                    | —                           |
 
 ### B. Azure Virtual Desktop (VDI)
 
-| Composant | Configuration | Notes |
-|-----------|--------------|-------|
-| Host Pool | Pooled (32 users) + Personal (praticiens nomades) | Logiciel patient virtualisé |
-| Session Hosts | Standard_D4s_v3 × 3 | Availability Zone 1/2/3 |
-| FSLogix Profile Containers | Azure Files Premium | Profils utilisateurs persistants |
-| MSI / Intune | Déploiement logiciel patient automatisé | Version centralisée unique |
-| Accès praticiens nomades | Via navigateur ou client RD (HTTPS) | Pas de VPN obligatoire |
+| Composant                  | Configuration                                     | Notes                            |
+| -------------------------- | ------------------------------------------------- | -------------------------------- |
+| Host Pool                  | Pooled (32 users) + Personal (praticiens nomades) | Logiciel patient virtualisé      |
+| Session Hosts              | Standard_D4s_v3 × 3                               | Availability Zone 1/2/3          |
+| FSLogix Profile Containers | Azure Files Premium                               | Profils utilisateurs persistants |
+| MSI / Intune               | Déploiement logiciel patient automatisé           | Version centralisée unique       |
+| Accès praticiens nomades   | Via navigateur ou client RD (HTTPS)               | Pas de VPN obligatoire           |
 
 ### C. Stockage Azure
 
-| Composant | Service | Capacité | Rétention |
-|-----------|---------|----------|-----------|
-| Dossiers patients | Azure Files Premium (SMB 3.0) | 1 To scalable | Snapshot daily 30j |
-| Imageries médicales | Azure NetApp Files | 2 To standard | Snapshot horaire |
-| Backup vault | Azure Backup (GRS) | Illimité | 30j opérationnel + 1 an archive |
-| Soft delete | Activé sur tous les comptes | 30j | Protection ransomware |
-| Chiffrement | Azure Storage Service Encryption | AES-256 | Transparent, géré Azure |
+| Composant           | Service                          | Capacité      | Rétention                       |
+| ------------------- | -------------------------------- | ------------- | ------------------------------- |
+| Dossiers patients   | Azure Files Premium (SMB 3.0)    | 1 To scalable | Snapshot daily 30j              |
+| Imageries médicales | Azure NetApp Files               | 2 To standard | Snapshot horaire                |
+| Backup vault        | Azure Backup (GRS)               | Illimité      | 30j opérationnel + 1 an archive |
+| Soft delete         | Activé sur tous les comptes      | 30j           | Protection ransomware           |
+| Chiffrement         | Azure Storage Service Encryption | AES-256       | Transparent, géré Azure         |
 
 ### D. Sécurité Réseau
 
-| Composant | Configuration | Remplace |
-|-----------|--------------|---------|
-| Azure Firewall Premium | IDPS, TLS inspection, FQDN filtering | FortiGate hardware |
-| NSG (Network Security Groups) | Règles par subnet (Deny-All + allow-list) | ACL VLAN |
-| Azure Private Endpoints | Azure Files + NetApp (pas d'accès public) | — |
-| Azure Bastion | Accès admin SSH/RDP sans IP publique | Jump server |
-| DDoS Protection Basic | Inclus nativement | — |
-| Azure Policy | Enforce HDS-compliant settings | Audit manuel |
+| Composant                     | Configuration                             | Remplace           |
+| ----------------------------- | ----------------------------------------- | ------------------ |
+| Azure Firewall Premium        | IDPS, TLS inspection, FQDN filtering      | FortiGate hardware |
+| NSG (Network Security Groups) | Règles par subnet (Deny-All + allow-list) | ACL VLAN           |
+| Azure Private Endpoints       | Azure Files + NetApp (pas d'accès public) | —                  |
+| Azure Bastion                 | Accès admin SSH/RDP sans IP publique      | Jump server        |
+| DDoS Protection Basic         | Inclus nativement                         | —                  |
+| Azure Policy                  | Enforce HDS-compliant settings            | Audit manuel       |
 
 ### E. Backup & Disaster Recovery
 
-| Composant | Service | RPO | RTO |
-|-----------|---------|-----|-----|
-| Azure Backup — VMs | Recovery Services Vault (GRS) | 1h | < 30 min |
-| Azure Backup — Files | Azure Files snapshots | 1h (schedule) | < 5 min (restore snapshot) |
-| Azure Site Recovery | Réplication FR Central → FR South | < 15 min | < 30 min |
-| Soft Delete | Comptes stockage + Backup vault | — | 30j de protection |
-| Runbooks | Azure Automation (failover automatique) | — | Déclenchement automatique |
-| Test DR | Mensuel (non-disruptif via ASR Test Failover) | — | Documenté |
+| Composant            | Service                                       | RPO           | RTO                        |
+| -------------------- | --------------------------------------------- | ------------- | -------------------------- |
+| Azure Backup — VMs   | Recovery Services Vault (GRS)                 | 1h            | < 30 min                   |
+| Azure Backup — Files | Azure Files snapshots                         | 1h (schedule) | < 5 min (restore snapshot) |
+| Azure Site Recovery  | Réplication FR Central → FR South             | < 15 min      | < 30 min                   |
+| Soft Delete          | Comptes stockage + Backup vault               | —             | 30j de protection          |
+| Runbooks             | Azure Automation (failover automatique)       | —             | Déclenchement automatique  |
+| Test DR              | Mensuel (non-disruptif via ASR Test Failover) | —             | Documenté                  |
 
 ### F. Monitoring & SIEM
 
-| Composant | Service | Usage |
-|-----------|---------|-------|
-| Azure Monitor | Métriques CPU/RAM/Disk/Réseau toutes ressources | Remplace Zabbix |
-| Log Analytics Workspace | Centralisation tous les logs (AVD, Firewall, Entra) | Remplace ELK |
-| Microsoft Sentinel | SIEM — détection anomalies, audit trail HDS | Audit RGPD |
-| Azure Monitor Alerts | Alertes email + SMS + webhook | Remplace alertes Zabbix |
-| Azure Workbooks | Dashboards métier (uptime, activité patients) | Remplace Grafana |
-| Diagnostic Settings | Activés sur toutes les ressources critiques | — |
+| Composant               | Service                                             | Usage                   |
+| ----------------------- | --------------------------------------------------- | ----------------------- |
+| Azure Monitor           | Métriques CPU/RAM/Disk/Réseau toutes ressources     | Remplace Zabbix         |
+| Log Analytics Workspace | Centralisation tous les logs (AVD, Firewall, Entra) | Remplace ELK            |
+| Microsoft Sentinel      | SIEM — détection anomalies, audit trail HDS         | Audit RGPD              |
+| Azure Monitor Alerts    | Alertes email + SMS + webhook                       | Remplace alertes Zabbix |
+| Azure Workbooks         | Dashboards métier (uptime, activité patients)       | Remplace Grafana        |
+| Diagnostic Settings     | Activés sur toutes les ressources critiques         | —                       |
 
 ---
 
@@ -211,25 +226,25 @@ infrastructure/terraform/
     └── production/            # Production post-validation client
 ```
 
-> **Remote state :** Azure Storage Account (chiffré, accès via Managed Identity)  
-> **Secrets :** Azure Key Vault — jamais de credentials en clair dans les `.tf`  
+> **Remote state :** Azure Storage Account (chiffré, accès via Managed Identity)
+> **Secrets :** Azure Key Vault — jamais de credentials en clair dans les `.tf`
 > **CI/CD :** GitHub Actions (plan + apply sur merge sur `main`)
 
 ---
 
 ## 6️⃣ Conformité HDS / RGPD
 
-| Exigence | Solution Azure | Statut |
-|----------|---------------|--------|
-| Hébergement certifié HDS | Azure France Central (certifié HDS 2019-2026) | ✅ Natif |
-| Données en France uniquement | Région `francecentral` + `francesouth` | ✅ Enforced via Azure Policy |
-| Chiffrement repos | Azure SSE AES-256 | ✅ Natif |
-| Chiffrement transit | TLS 1.2+ (Azure enforced) | ✅ Natif |
-| Audit trail accès patients | Microsoft Sentinel + Log Analytics | ✅ À configurer |
-| Rétention logs | Log Analytics — 2 ans minimum | ✅ Configurable |
-| RGPD — droit à l'oubli | Azure Policy + lifecycle management | ⚠️ À documenter |
-| DPO | Entra ID — rôle Privacy Reader à désigner | ⚠️ À nommer |
-| AIPD | À réaliser avec données Azure Defender for Cloud | ⚠️ Planifié entretien 2 |
+| Exigence                     | Solution Azure                                   | Statut                       |
+| ---------------------------- | ------------------------------------------------ | ---------------------------- |
+| Hébergement certifié HDS     | Azure France Central (certifié HDS 2019-2026)    | ✅ Natif                     |
+| Données en France uniquement | Région `francecentral` + `francesouth`           | ✅ Enforced via Azure Policy |
+| Chiffrement repos            | Azure SSE AES-256                                | ✅ Natif                     |
+| Chiffrement transit          | TLS 1.2+ (Azure enforced)                        | ✅ Natif                     |
+| Audit trail accès patients   | Microsoft Sentinel + Log Analytics               | ✅ À configurer              |
+| Rétention logs               | Log Analytics — 2 ans minimum                    | ✅ Configurable              |
+| RGPD — droit à l'oubli       | Azure Policy + lifecycle management              | ⚠️ À documenter              |
+| DPO                          | Entra ID — rôle Privacy Reader à désigner        | ⚠️ À nommer                  |
+| AIPD                         | À réaliser avec données Azure Defender for Cloud | ⚠️ Planifié entretien 2      |
 
 ---
 
@@ -273,42 +288,44 @@ infrastructure/terraform/
 - [ ] Documentation finale + remise accès Terraform au client
 
 ---
-│                                                               │
-│  ┌──────────────┐         ┌─────────────────────┐           │
-│  │ Firewall HA  │◄────────┤ Internet (Fibre Box)│           │
-│  └──────────────┘         └─────────────────────┘           │
-│         │                                                    │
-│  ┌──────┴──────────────────────────────────┐               │
-│  │        Réseau Cœur (Switchs HA)         │               │
-│  └──────┬──────────────────────────────────┘               │
-│         │                                                    │
-│  ┌──────┴────────────────────────────────────────┐         │
-│  │  VLAN Segmentation                            │         │
-│  ├──────────────────────────────────────────────┤         │
-│  │ VLAN 100 (Métier) → Logiciel Patient + RDS  │         │
-│  │ VLAN 200 (Invités) → Wi-Fi Patients         │         │
-│  │ VLAN 300 (Admin) → Gestion + Accès Sécurisé │         │
-│  │ VLAN 400 (Imagerie) → Serveur Stockage      │         │
-│  └──────┬───────────────────────────────────────┘         │
-│         │                                                   │
-│  ┌──────┴──────────────┬──────────────┬──────────────┐    │
-│  │                     │              │              │    │
-│  ▼                     ▼              ▼              ▼    │
-│ ┌─────────────┐   ┌─────────────┐ ┌─────────┐  ┌──────┐  │
-│ │ RDS/VDI     │   │  NAS        │ │ Backup  │  │ Wi-Fi│  │
-│ │ Logiciel    │   │  Imagerie   │ │ Externe │  │ HA   │  │
-│ │ Patient     │   │  4To        │ │ Immuable│  │      │  │
-│ │ HA/Scaling  │   │  Snapshots  │ │ Off-Site│  │ Mesh │  │
-│ └─────────────┘   └─────────────┘ └─────────┘  └──────┘  │
-│                                                             │
-│  ┌──────────────────────────────────────────────┐         │
-│  │ Monitoring & Alertes (Zabbix/Prometheus)    │         │
-│  │ - CPU/Mémoire/Stockage                      │         │
-│  │ - Disponibilité RDS/NAS                     │         │
-│  │ - Compliance HDS                            │         │
-│  └──────────────────────────────────────────────┘         │
-│                                                             │
+
+│ │
+│ ┌──────────────┐ ┌─────────────────────┐ │
+│ │ Firewall HA │◄────────┤ Internet (Fibre Box)│ │
+│ └──────────────┘ └─────────────────────┘ │
+│ │ │
+│ ┌──────┴──────────────────────────────────┐ │
+│ │ Réseau Cœur (Switchs HA) │ │
+│ └──────┬──────────────────────────────────┘ │
+│ │ │
+│ ┌──────┴────────────────────────────────────────┐ │
+│ │ VLAN Segmentation │ │
+│ ├──────────────────────────────────────────────┤ │
+│ │ VLAN 100 (Métier) → Logiciel Patient + RDS │ │
+│ │ VLAN 200 (Invités) → Wi-Fi Patients │ │
+│ │ VLAN 300 (Admin) → Gestion + Accès Sécurisé │ │
+│ │ VLAN 400 (Imagerie) → Serveur Stockage │ │
+│ └──────┬───────────────────────────────────────┘ │
+│ │ │
+│ ┌──────┴──────────────┬──────────────┬──────────────┐ │
+│ │ │ │ │ │
+│ ▼ ▼ ▼ ▼ │
+│ ┌─────────────┐ ┌─────────────┐ ┌─────────┐ ┌──────┐ │
+│ │ RDS/VDI │ │ NAS │ │ Backup │ │ Wi-Fi│ │
+│ │ Logiciel │ │ Imagerie │ │ Externe │ │ HA │ │
+│ │ Patient │ │ 4To │ │ Immuable│ │ │ │
+│ │ HA/Scaling │ │ Snapshots │ │ Off-Site│ │ Mesh │ │
+│ └─────────────┘ └─────────────┘ └─────────┘ └──────┘ │
+│ │
+│ ┌──────────────────────────────────────────────┐ │
+│ │ Monitoring & Alertes (Zabbix/Prometheus) │ │
+│ │ - CPU/Mémoire/Stockage │ │
+│ │ - Disponibilité RDS/NAS │ │
+│ │ - Compliance HDS │ │
+│ └──────────────────────────────────────────────┘ │
+│ │
 └─────────────────────────────────────────────────────────────┘
+
 ```
 
 ---
@@ -437,3 +454,4 @@ infrastructure/terraform/
 ---
 
 **Prochaine Étape:** Valider architecture avec client → Créer REQUIREMENTS.md détaillé
+```
