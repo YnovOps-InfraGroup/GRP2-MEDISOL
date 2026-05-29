@@ -27,16 +27,16 @@
 
 | Exigence | Statut actuel | Cible |
 |----------|--------------|-------|
-| **HDS** | ❌ Aucune certification | ✅ Obligatoire (données santé) |
-| **Souveraineté** | ❌ Données sur PC local non sécurisé | ✅ Hébergeur certifié HDS, sol français |
-| **RGPD** | ❌ Aucun DPO, aucune AIPD | ✅ DPO à désigner, AIPD à réaliser |
-| **Gestion comptes** | ❌ **Compte unique `Lyliandu33`** pour 32 employés | ✅ Comptes nominatifs + AD |
+| **HDS** | ❌ Aucune certification | ✅ Azure France Central — certifié HDS (obligation légale) |
+| **Souveraineté** | ❌ Données sur PC local non sécurisé | ✅ Azure France Central + France South (données FR uniquement) |
+| **RGPD** | ❌ Aucun DPO, aucune AIPD | ✅ DPO à désigner, AIPD à réaliser (Azure Defender for Cloud) |
+| **Gestion comptes** | ❌ **Compte unique `Lyliandu33`** pour 32 employés | ✅ Comptes nominatifs + Microsoft Entra ID P2 |
 | **Mot de passe** | ❌ Jamais modifié | ✅ Politique MDP stricte + rotation |
-| **Chiffrement disque** | ⚠️ BitLocker ("méga faille" selon gérante) | ✅ AES-256 validé |
-| **Chiffrement transit** | ❌ Non confirmé | ✅ TLS 1.2+ |
-| **Audit trail** | ❌ Inexistant | ✅ Logs tous accès patients |
-| **2FA** | ❌ Inexistant | ✅ Accès distants obligatoire |
-| **Segmentation réseau** | ❌ Réseau plat unique | ✅ VLAN métier/invités/admin/imagerie |
+| **Chiffrement disque** | ⚠️ BitLocker ("méga faille" selon gérante) | ✅ Azure SSE AES-256 natif (géré Azure) |
+| **Chiffrement transit** | ❌ Non confirmé | ✅ TLS 1.2+ enforced Azure + Azure Firewall |
+| **Audit trail** | ❌ Inexistant | ✅ Microsoft Sentinel + Log Analytics Workspace |
+| **2FA** | ❌ Inexistant | ✅ Entra ID Conditional Access (MFA obligatoire) |
+| **Segmentation réseau** | ❌ Réseau plat unique | ✅ Azure VNet Subnets + NSG + Azure Firewall Premium |
 
 ### 3. Performance & Utilisateurs
 
@@ -52,12 +52,12 @@
 
 | Exigence | Valeur actuelle | Cible |
 |----------|----------------|-------|
-| **Stockage actuel** | 2 To (PC Windows) | NAS RAID6 redondant |
-| **Volume data** | À mesurer lors audit on-site | ~500 GB estimé |
-| **Rétention légale** | Non appliquée | 5–6 ans (réglementation santé) |
-| **Backup fréquence** | Manuel, irrégulier | 4×/jour incrémental + 1×/nuit full |
-| **Backup off-site** | ❌ Inexistant | ✅ Cloud HDS (OVH/Scaleway) |
-| **Protection ransomware** | ❌ Aucune | ✅ Snapshots immuables 30j |
+| **Stockage actuel** | 2 To (PC Windows) | Azure Files Premium + Azure NetApp Files |
+| **Volume data** | À mesurer lors audit on-site | ~500 GB estimé (scalable) |
+| **Rétention légale** | Non appliquée | 5–6 ans — Azure Lifecycle Management |
+| **Backup fréquence** | Manuel, irrégulier | Azure Backup GRS — RPO 1h |
+| **Backup off-site** | ❌ Inexistant | ✅ Azure Backup GRS (France South) |
+| **Protection ransomware** | ❌ Aucune | ✅ Soft delete 30j + snapshots immuables Azure |
 
 ---
 
@@ -122,11 +122,28 @@
 
 ---
 
-## 📅 Timeline Indicatif
+## � Stack Technique Azure
 
-- **Semaines 1-2** : Audit + Validation architecture
-- **Semaines 3-4** : Commande équipements + Préparation
-- **Semaines 5-8** : Déploiement infrastructure
+| Composant | Service / Outil | Version |
+|-----------|----------------|--------|
+| IaC | Terraform (`azurerm` provider) | ≥ 4.x |
+| VDI | Azure Virtual Desktop (AVD) | Pooled + Personal |
+| Identité | Microsoft Entra ID P2 | + MFA + CA |
+| Stockage | Azure Files Premium + Azure NetApp Files | — |
+| Backup | Azure Backup (GRS) + ASR | Vault France Central |
+| Monitoring | Azure Monitor + Log Analytics + Sentinel | — |
+| Firewall | Azure Firewall Premium | IDPS + TLS inspection |
+| VPN | Azure VPN Gateway P2S | VpnGw2 |
+| Accès admin | Azure Bastion | — |
+| Secrets | Azure Key Vault | Standard |
+
+## 📅 Timeline Déploiement Terraform
+
+- **Semaines 1–2** : Foundation (VNet, Entra ID, Key Vault)
+- **Semaines 3–4** : Services cœur (AVD, Azure Files, NetApp)
+- **Semaines 5–6** : Backup + Monitoring (ASR, Sentinel, alertes)
+- **Semaines 7–8** : Migration données + basculement pilot (5 users)
+- **Semaine 9+** : Cutover 32 users + mise hors service PC Windows
 - **Semaines 9-10** : Tests PRA + Validation HDS
 - **Semaine 11+** : Mise en production + Support
 
