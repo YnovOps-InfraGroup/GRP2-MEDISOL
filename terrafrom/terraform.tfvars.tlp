@@ -1,0 +1,9 @@
+location              = "West Europe"
+environment           = "prod"
+project_name          = "medisol"
+onprem_public_ip      = "198.51.100.1" # Remplacer par l'IP WAN publique de votre FW
+onprem_local_networks = [
+  "10.10.10.0/24", # Exemple : VLAN SERVEUR (Azure Stack HCI)
+  "10.10.20.0/24"  # Exemple : VLAN Médical
+]
+vpn_shared_key        = "SuperSecretPreSharedKeyChangeMe123!"
